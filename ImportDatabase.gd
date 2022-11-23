@@ -37,31 +37,31 @@ func load_data_from_test():
 			id = 2242643072,
 			lat = 47.6044448,
 			lon = 19.3695053,
-			value = null
+			tags = null
 		},
 		{
 			id = 2242643068,
 			lat = 47.6028804,
 			lon = 19.369778,
-			value = null
+			tags = null
 		},
 		{
 			id = 8622689676,
 			lat = 47.6020004,
 			lon = 19.3699275,
-			value = "{\"tags\": [{\"k\": \"direction\", \"v\": \"forward\"}, {\"k\": \"highway\", \"v\": \"stop\"} ]}"
+			tags = "{\"tags\": [{\"k\": \"direction\", \"v\": \"forward\"}, {\"k\": \"highway\", \"v\": \"stop\"} ]}"
 		},
 		{
 			id = 493926385,
 			lat = 47.6018953,
 			lon = 19.3699454,
-			value = null
+			tags = null
 		},
 		{
 			id = 8628863462,
 			lat = 47.6019841,
 			lon = 19.3699303,
-			value = null
+			tags = null
 		}
 	]
 	var ways_query_result = [
@@ -87,7 +87,7 @@ func load_data_from_test():
 
 func load_data():
 
-	var loaded = load_data_from_test()
+	var loaded = load_data_from_database()
 	var all_nodes = []
 	var unused_nodes = []
 	var ways = []
@@ -97,13 +97,17 @@ func load_data():
 	# are submitted to the world as a separate node list
 	# (This method is not applied to ways and relations)
 	for row in loaded.nodes_query_result:
-		all_nodes.append({
+		var node = {
 			id = row.id,
 			lat = row.lat,
 			lon = row.lon,
-			tags = JSON.parse(row.value).result.tags if row.value != null else [],
 			used = false
-		})
+		}
+		
+		if row.tags != null:
+			node.tags = JSON.parse(row.tags).result.tags
+		
+		all_nodes.append(node)
 	
 	# Construct ways
 	for row in loaded.ways_query_result:
