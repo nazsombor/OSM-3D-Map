@@ -2,21 +2,16 @@ extends Node
 
 const SQLite = preload("res://addons/godot-sqlite/bin/gdsqlite.gdns")
 var db
-var db_name := "res://data/tanya.db"
 
 signal on_load(nodes, ways, relations)
 
-func _ready():
-	load_data()
-
-
-
-
-func load_data_from_database():
+func _init(path):
 	db = SQLite.new()
-	db.path = db_name
+	db.path = path
 	db.open_db()
-	
+
+
+func _load_data_from_database():
 	db.query("select * from nodes;")
 	var nodes_query_result = db.query_result
 	db.query("select * from ways;")
@@ -31,7 +26,7 @@ func load_data_from_database():
 	}
 
 
-func load_data_from_test():
+func _load_data_from_test():
 	var nodes_query_result = [
 		{
 			id = 2242643072,
@@ -87,7 +82,7 @@ func load_data_from_test():
 
 func load_data():
 
-	var loaded = load_data_from_database()
+	var loaded = _load_data_from_test()
 	var all_nodes = []
 	var unused_nodes = []
 	var ways = []
@@ -191,6 +186,10 @@ func load_data():
 		if node.used == false:
 			unused_nodes.append(node)
 			node.erase("used")
-
-	emit_signal("on_load", unused_nodes, ways, relations)
+			
+	return {
+		nodes = unused_nodes,
+		ways = ways,
+		relations = relations
+	}
 
