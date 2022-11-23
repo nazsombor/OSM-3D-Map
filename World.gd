@@ -14,11 +14,8 @@ var WORLD_POSITION_LON = 19.3690
 var WORLD_DISTANCE_RATIO = 5000
 
 
-func _ready():
-	pass
-
-
 func draw_a_way(index):
+	print(ways[index])
 	var mesh_arr = []
 	var mesh_vertices = PoolVector3Array()
 	var mesh_colors = PoolColorArray()
@@ -48,24 +45,22 @@ func draw_a_way(index):
 	mi.mesh.add_surface_from_arrays(Mesh.PRIMITIVE_LINE_STRIP, mesh_arr)
 	add_child(mi)
 
-	pass
 
 func latToMeter(lat):
 	return (lat - WORLD_POSITION_LAT) * WORLD_DISTANCE_RATIO
-
 
 
 func lonToMeter(lon):
 	return (lon - WORLD_POSITION_LON) * WORLD_DISTANCE_RATIO
 
 
-func _on_ImportDatabase_nodes_ready(nodes, ways, relations):
+func _on_Timer_timeout():
+	if i < ways.size() :
+		draw_a_way(i)
+		i += 1
+
+
+func _on_ImportDatabase_on_load(nodes, ways, relations):
 	self.nodes.append_array(nodes)
 	self.ways.append_array(ways)
 	self.relations.append_array(relations)
-
-
-func _on_Timer_timeout():
-	draw_a_way(i)
-	i += 1
-	pass # Replace with function body.

@@ -19,5 +19,5 @@ transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 14.4156, -8.32374 )
 wait_time = 0.1
 autostart = true
 
-[connection signal="nodes_ready" from="ImportDatabase" to="." method="_on_ImportDatabase_nodes_ready"]
+[connection signal="on_load" from="ImportDatabase" to="." method="_on_ImportDatabase_on_load"]
 [connection signal="timeout" from="Timer" to="." method="_on_Timer_timeout"]
