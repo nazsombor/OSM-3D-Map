@@ -1,0 +1,14 @@
+[gd_scene load_steps=2 format=2]
+
+[sub_resource type="SpatialMaterial" id=1]
+emission_enabled = true
+emission = Color( 0.529412, 0.235294, 0.235294, 1 )
+emission_energy = 1.0
+emission_operator = 0
+emission_on_uv2 = false
+
+[node name="CSGBox" type="CSGBox"]
+width = 1.0
+height = 1.0
+depth = 1.0
+material = SubResource( 1 )
