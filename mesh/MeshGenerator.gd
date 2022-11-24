@@ -4,16 +4,16 @@ var world_position_lat = 47.6040
 var world_position_lon = 19.3690
 var distance_ratio = 5000
 
-# Mesh types
-const HIGHWAY_RESITENTIAL = "highway-resitential"
-const UNSPECIFIED = "__unspecified__"
 
 var add_line
 var add_label
+var add_point
 
-func _init(add_line, add_label):
+
+func _init(add_line, add_label, add_point):
 	self.add_line = add_line
 	self.add_label = add_label
+	self.add_point = add_point
 	
 func line(a, b, color = Color.blue):
 	add_line.call_func(a, b, color)
@@ -21,6 +21,9 @@ func line(a, b, color = Color.blue):
 func label(vector, text = null, color = Color(.7, 0, 0)):
 	if text == null: text = str(Vector2(vector.x, vector.z).round())
 	add_label.call_func(vector, text, color)
+
+func point(vector, color = Color.red):
+	add_point.call_func(vector, color)
 
 
 func _line_intersect(aFrom, aTo, bFrom, bTo):
@@ -41,43 +44,53 @@ func node_to_mesh_array(node):
 
 
 func way(way):
-	match type_of(way):
-		HIGHWAY_RESITENTIAL: return road(way)
-		UNSPECIFIED: return way_mesh_array(way)
+	if not way.has("tags"):
+		return way_mesh_array(way)
+	
+	for tag in way.tags:
+		match tag.k:
+			"highway":
+				match tag.v:
+					"residential": return road(way)
+					"unclassified": return road(way)
+					"track": return road(way)
+					"service": return road(way)
+					"footway": return road(way, .02)
+					"path": return road(way, .02)
+			"waterway": return way_mesh_array(way)
+			"building": return way_mesh_array(way)
+			"landuse":
+				match tag.v:
+					"forest": return way_mesh_array(way)
+					_: return way_mesh_array(way)
+			_: return way_mesh_array(way)
+
 
 func relation(relation):
 	pass
 
 
-func type_of(way):
-	for tag in way.tags:
-		match tag.k:
-			"highway":
-				match tag.v:
-					"residential": return HIGHWAY_RESITENTIAL
-			_: return UNSPECIFIED
-
-
-func road(way, road_radius = 2.5):
+func road(way, road_radius = .1):
 	var at = ArrayMeshTool.new()
-	var one_side = []
-	var other_side = []
-	var step = 5
-	for i in range(step if step != 0 else way.nodes.size()):
+	var arr = []
+	
+	for i in range(way.nodes.size()):
 
 		if i == 0:
 			var a = vector3(way.nodes[i])
 			var b = vector3(way.nodes[i + 1])
 			var ab = b - a
 			var abr = ab.normalized().rotated(Vector3(0, 1, 0), PI/2) * road_radius
-			var x = a - abr
-			var y = a + abr
+			var x = a + abr
+			var y = a - abr
 			
 			line(a, a + abr)
 			line(a, a - abr)
+			point(x)
+			point(y)
 			
-			one_side.append(x)
-			other_side.append(y)
+			arr.append(x)
+			arr.append(y)
 			
 		elif i == way.nodes.size() -1:
 			var a = vector3(way.nodes[i])
@@ -88,11 +101,10 @@ func road(way, road_radius = 2.5):
 			line(a, a - abr)
 			var x = a - abr
 			var y = a + abr
-			
-			one_side.append(x)
-			other_side.append(y)
-			print(x)
-			print(y)
+			point(x)
+			point(y)
+			arr.append(x)
+			arr.append(y)
 		else:
 			var a = vector3(way.nodes[i - 1])
 			var b = vector3(way.nodes[i])
@@ -105,26 +117,34 @@ func road(way, road_radius = 2.5):
 			var bcr = bc.normalized().rotated(Vector3(0, 1, 0), PI/2) * road_radius
 			line(b, b + bcr)
 			line(b, b - bcr)
-			line(a + abr, b + abr, Color.red)
-			line(b + bcr, c + bcr, Color.red)
-			line(a - abr, b - abr, Color.green)
-			line(b - bcr, c - bcr, Color.green)
-			var x = _line_intersect(a + abr, b + abr, b + bcr, c + bcr)
-			var y = _line_intersect(a - abr, b - abr, b - bcr, c - bcr)
-			one_side.append(x)
-			other_side.append(y)
-			print(x)
-			print(y)
+			line(a + abr, b + abr, Color.orange)
+			line(b + bcr, c + bcr, Color.orange)
+			line(a - abr, b - abr, Color.yellow)
+			line(b - bcr, c - bcr, Color.yellow)
+			var x = b + abr
+			var y = b - abr
+			point(b + bcr, Color.rebeccapurple)
+			point(b - bcr, Color.rebeccapurple)
+			arr.append(x)
+			arr.append(y)
 	
-	print(".....")
-	for i in range(0, one_side.size()):
-		at.add_vertex(one_side[i])
-		print(one_side[i])
-
-	for i in range(other_side.size() - 1, -1, -1):
-		at.add_vertex(other_side[i])
-		print(other_side[i])
+	var step = 0
+	for i in range(0, arr.size()):
+		at.add_vertex(arr[i])
+		label(arr[i], str(step))
+		step += 1
 	
+	for i in range(arr.size() - 2):
+		if i % 2 == 0:
+			at.add_index(i)
+			at.add_index(i + 2)
+			at.add_index(i + 1)
+			pass
+		else:
+			at.add_index(i)
+			at.add_index(i + 1)
+			at.add_index(i + 2)
+			pass
 	
 	return at.commit()
 

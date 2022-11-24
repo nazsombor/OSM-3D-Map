@@ -1,3 +1,4 @@
+class_name WorldMap
 extends Spatial
 
 var timer_counter = 0
@@ -5,31 +6,50 @@ var nodes = []
 var ways = []
 var relations = []
 
-var db = DataImporter.new("res://data/tanya.db")
-var line_helper_script = preload("res://test/DebugImmediateGeometry.gd")
-var gen = MeshGenerator.new(funcref(self, "add_line"), funcref(self, "add_label"))
+var db = DataImporter.new("res://data/tanya.db", false)
+var line_helper_script = preload("res://test/DebugLineImmediateGeometry.gd")
+
+var gen = MeshGenerator.new(
+	funcref(self, "add_line"),
+	funcref(self, "add_label"),
+	funcref(self, "add_point"))
 
 func add_line(a, b, color):
+	if not $Debug.visible: return
 	var ig = ImmediateGeometry.new()
 	var mat = SpatialMaterial.new()
-	
 	mat.vertex_color_use_as_albedo = true
 	mat.flags_unshaded = true
 	mat.albedo_color = color
 	ig.material_override = mat
 	ig.set_script(line_helper_script)
 	ig.draw_helper_line(a, b)
-	add_child(ig)
+	$Debug.add_child(ig)
 
 func add_label(vector, text, color):
+	if not $Debug.visible: return
 	var l = Label3D.new()
 	l.text = text
-	l.pixel_size = .07
-	l.translation = vector.round() + Vector3(0, 0, -1)
+	l.pixel_size = .03
+	l.translation = vector.round()
 	l.rotate(Vector3(1, 0, 0), -PI/2)
 	l.modulate = Color(.6, 0, 0)
-	add_child(l)
-	pass
+	$Debug.add_child(l)
+	return l
+
+func add_point(vector, color):
+	if not $Debug.visible: return
+	var b = CSGBox.new()
+	var mat = SpatialMaterial.new()
+	mat.flags_unshaded = true
+	mat.albedo_color = color
+	b.material_override = mat
+	b.translation = vector
+	b.width = .05
+	b.height = .05
+	b.depth = .05
+	$Debug.add_child(b)
+
 
 func _ready():
 	var chunk = db.load_data()
@@ -43,7 +63,7 @@ func _ready():
 func generate_ways():
 	for way in ways:
 		var mesh = gen.way(way)
-		$RootMesh.mesh.add_surface_from_arrays(Mesh.PRIMITIVE_LINE_LOOP, mesh)
+		$RootMesh.mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, mesh)
 
 
 func generate_relations():

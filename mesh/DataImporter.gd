@@ -2,10 +2,12 @@ class_name DataImporter
 
 const SQLite = preload("res://addons/godot-sqlite/bin/gdsqlite.gdns")
 var db
+var test
 
 signal on_load(nodes, ways, relations)
 
-func _init(path):
+func _init(path, test = false):
+	self.test = test
 	db = SQLite.new()
 	db.path = path
 	db.open_db()
@@ -82,7 +84,7 @@ func _load_data_from_test():
 
 func load_data():
 
-	var loaded = _load_data_from_test()
+	var loaded = _load_data_from_test() if test else _load_data_from_database()
 	var all_nodes = []
 	var unused_nodes = []
 	var ways = []

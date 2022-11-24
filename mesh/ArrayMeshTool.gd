@@ -19,9 +19,11 @@ func set_color(color):
 
 func add_vertex(vertex):
 	vertices.append(vertex)
-	indices.append(_index_counter)
 	colors.append(color_list[_index_counter % color_list.size()])
-	_index_counter += 1
+
+
+func add_index(index):
+	indices.append(index)
 
 
 func commit():
