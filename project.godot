@@ -8,11 +8,37 @@
 
 config_version=4
 
+_global_script_classes=[ {
+"base": "Reference",
+"class": "ArrayMeshTool",
+"language": "GDScript",
+"path": "res://mesh/ArrayMeshTool.gd"
+}, {
+"base": "Reference",
+"class": "DataImporter",
+"language": "GDScript",
+"path": "res://mesh/DataImporter.gd"
+}, {
+"base": "Reference",
+"class": "MeshGenerator",
+"language": "GDScript",
+"path": "res://mesh/MeshGenerator.gd"
+} ]
+_global_script_class_icons={
+"ArrayMeshTool": "",
+"DataImporter": "",
+"MeshGenerator": ""
+}
+
 [application]
 
 config/name="Map"
-run/main_scene="res://World.tscn"
+run/main_scene="res://mesh/World.tscn"
 config/icon="res://icon.png"
+
+[display]
+
+window/size/fullscreen=true
 
 [editor]
 

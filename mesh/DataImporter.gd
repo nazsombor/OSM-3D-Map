@@ -1,4 +1,4 @@
-extends Node
+class_name DataImporter
 
 const SQLite = preload("res://addons/godot-sqlite/bin/gdsqlite.gdns")
 var db
