@@ -1,0 +1,33 @@
+[gd_scene load_steps=2 format=2]
+
+[ext_resource path="res://tools/tagviewer/Main.gd" type="Script" id=1]
+
+[node name="VBoxContainer" type="VBoxContainer"]
+margin_right = 1024.0
+margin_bottom = 600.0
+script = ExtResource( 1 )
+
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+margin_right = 1024.0
+margin_bottom = 20.0
+
+[node name="ButtonWayTags" type="Button" parent="HBoxContainer"]
+margin_right = 69.0
+margin_bottom = 20.0
+text = "Way tags"
+
+[node name="ButtonRelationTags" type="Button" parent="HBoxContainer"]
+margin_left = 73.0
+margin_right = 167.0
+margin_bottom = 20.0
+text = "Relation tags"
+
+[node name="ItemList" type="ItemList" parent="."]
+margin_top = 24.0
+margin_right = 1024.0
+margin_bottom = 600.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[connection signal="pressed" from="HBoxContainer/ButtonWayTags" to="." method="_on_ButtonWayTags_pressed"]
+[connection signal="pressed" from="HBoxContainer/ButtonRelationTags" to="." method="_on_ButtonRelationTags_pressed"]

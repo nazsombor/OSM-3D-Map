@@ -6,7 +6,7 @@ var nodes = []
 var ways = []
 var relations = []
 
-var db = DataImporter.new("res://data/tanya.db", false)
+var db = DataImporter.new()
 var line_helper_script = preload("res://test/DebugLineImmediateGeometry.gd")
 
 var gen = MeshGenerator.new(

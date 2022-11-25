@@ -6,10 +6,10 @@ var test
 
 signal on_load(nodes, ways, relations)
 
-func _init(path, test = false):
+func _init(test = false):
 	self.test = test
 	db = SQLite.new()
-	db.path = path
+	db.path = "res://data/tanya.db"
 	db.open_db()
 
 
