@@ -87,12 +87,12 @@ func load_data():
 	var loaded = _load_data_from_test() if test else _load_data_from_database()
 	var all_nodes = []
 	var unused_nodes = []
-	var ways = []
+	var all_ways = []
+	var unused_ways = []
 	var relations = []
 	
 	# Only nodes that wasn't used by ways and relations
 	# are submitted to the world as a separate node list
-	# (This method is not applied to ways and relations)
 	for row in loaded.nodes_query_result:
 		var node = {
 			id = row.id,
@@ -115,7 +115,8 @@ func load_data():
 			minLon = row.minLon,
 			maxLat = row.maxLat,
 			maxLon = row.maxLon,
-			nodes = []
+			nodes = [],
+			used = false
 		}
 		
 		if value.has("tags"):
@@ -127,7 +128,7 @@ func load_data():
 					way.nodes.append(node)
 					node.used = true
 		
-		ways.append(way)
+		all_ways.append(way)
 	
 	# Construct relations part I:
 	# Add relation member references
@@ -164,9 +165,10 @@ func load_data():
 								relation.nodes.append(node)
 								node.used = true
 					"way":
-						for way in ways:
+						for way in all_ways:
 							if way.id == member.ref:
 								relation.ways.append(way)
+								way.used = true
 								break
 					"relation":
 						relation.relation_refs.append(member.ref)
@@ -188,10 +190,16 @@ func load_data():
 		if node.used == false:
 			unused_nodes.append(node)
 			node.erase("used")
-			
+	
+	# Unused ways
+	for way in all_ways:
+		if way.used == false:
+			unused_ways.append(way)
+			way.erase("used")
+	
 	return {
 		nodes = unused_nodes,
-		ways = ways,
+		ways = unused_ways,
 		relations = relations
 	}
 
