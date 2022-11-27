@@ -21,6 +21,9 @@ func add_index(index):
 	indices.append(index)
 
 
+func vertices_size():
+	return vertices.size()
+
 func commit():
 	var mesh_arr = []
 	

@@ -1,15 +1,9 @@
 class_name WorldMap
 extends Spatial
 
-var timer_counter = 0
-var nodes = []
-var ways = []
-var relations = []
-
-var db = DataImporter.new()
-var line_helper_script = preload("res://test/DebugLineImmediateGeometry.gd")
-
-var gen = MeshGenerator.new(
+export var debug = false
+var db = DataImporter.new(debug)
+var gen = MeshInstanceGenerator.new(
 	funcref(self, "add_debug_line"),
 	funcref(self, "add_debug_label"),
 	funcref(self, "add_debug_point"))
@@ -17,31 +11,23 @@ var gen = MeshGenerator.new(
 
 func _ready():
 	var chunk = db.load_data()
-	nodes = chunk.nodes
-	ways = chunk.ways
-	relations = chunk.relations
-	generate_ways()
-	generate_relations();
+	build_chunk(chunk)
 
 
-func generate_nodes():
-	var mesh = gen.nodes(nodes)
-	$RootMesh.mesh.add_surface_from_arrays(Mesh.PRIMITIVE_POINTS, mesh)
-
-
-func generate_ways():
-	for way in ways:
-		var mesh = gen.way(way)
-		$RootMesh.mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, mesh)
-
-
-func generate_relations():
-	for relation in relations:
-		var mesh_arrs = gen.relation(relation)
-		$RootMesh.mesh.add_surface_from_arrays(Mesh.PRIMITIVE_POINTS, mesh_arrs.node_mesh_arr)
+func build_chunk(chunk):
+	for node in chunk.nodes:
+		build_mesh(gen.node(node))
 		
-		for mesh_arr in mesh_arrs.way_mesh_arrs:
-			$RootMesh.mesh.add_surface_from_arrays(Mesh.PRIMITIVE_LINE_STRIP, mesh_arr)
+	for way in chunk.ways:
+		build_mesh(gen.way(way))
+		
+	for relation in chunk.relations:
+		build_mesh(gen.relation(relation))
+
+
+func build_mesh(data):
+	for object in data:
+		add_child(object)
 
 
 func add_debug_line(a, b, color):
@@ -52,7 +38,7 @@ func add_debug_line(a, b, color):
 	mat.flags_unshaded = true
 	mat.albedo_color = color
 	ig.material_override = mat
-	ig.set_script(line_helper_script)
+	ig.set_script(preload("res://test/DebugLineImmediateGeometry.gd"))
 	ig.draw_helper_line(a, b)
 	$Debug.add_child(ig)
 

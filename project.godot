@@ -15,14 +15,19 @@ _global_script_classes=[ {
 "path": "res://mesh/ArrayMeshTool.gd"
 }, {
 "base": "Reference",
+"class": "BaseMeshInstanceGenerator",
+"language": "GDScript",
+"path": "res://mesh/BaseMeshInstanceGenerator.gd"
+}, {
+"base": "Reference",
 "class": "DataImporter",
 "language": "GDScript",
 "path": "res://mesh/DataImporter.gd"
 }, {
-"base": "Reference",
-"class": "MeshGenerator",
+"base": "BaseMeshInstanceGenerator",
+"class": "MeshInstanceGenerator",
 "language": "GDScript",
-"path": "res://mesh/MeshGenerator.gd"
+"path": "res://mesh/MeshInstanceGenerator.gd"
 }, {
 "base": "Spatial",
 "class": "WorldMap",
@@ -31,8 +36,9 @@ _global_script_classes=[ {
 } ]
 _global_script_class_icons={
 "ArrayMeshTool": "",
+"BaseMeshInstanceGenerator": "",
 "DataImporter": "",
-"MeshGenerator": "",
+"MeshInstanceGenerator": "",
 "WorldMap": ""
 }
 
